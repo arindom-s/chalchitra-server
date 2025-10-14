@@ -23,6 +23,7 @@ export const Register=async(req:Request,res:Response)=>{
         user_name,
         email,
         password:hashedPassword,
+        provider:"local"
     });
     const token=generateToken({id:newUser._id, email:newUser.email});
     res.status(200).json({
@@ -51,6 +52,11 @@ export const SignIn=async(req:Request,res:Response)=>{
         success:false,
         message: "Email is not registered",
       });
+    }
+    if(user.provider !=="local"){
+      return res.status(400).json({
+        message:"Please Google login"
+      })
     }
     const isMatchPassword= await bcrypt.compare(password,foundUser.password);
     if(!isMatchPassword){

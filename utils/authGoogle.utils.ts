@@ -14,7 +14,7 @@ passport.use(
     new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID as string,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    callbackURL: "http://localhost:5173/callback"
+    callbackURL: "http://localhost:3010/api/auth/callback"
 },
 async (
     accessToken:string,
@@ -30,6 +30,8 @@ async (
         user=await User.create({
             user_name: profile.displayName,
             email: profile.emails?.[0].value,
+            googleId:profile.id,
+            provider: "google"
         })
     }
     return done(null,user as IUser);
@@ -39,16 +41,3 @@ async (
 }
 ));
 
-passport.serializeUser((user:IUser,done)=>{
-    done(null,user.id);
-})
-
-passport.deserializeUser(async(id:string,done)=>{
-    try{
-        const user=await User.findById(id);
-        done(null,user as IUser);
-    } catch(err){
-        done(err as Error,null);
-    }
-}
-);
